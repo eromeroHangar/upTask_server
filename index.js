@@ -1,6 +1,6 @@
-import express from 'express';
+import express, { json } from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
+import { corsMiddleware } from './middleware/cors.js';
 import conectarDB from './config/db.js';
 import usuarioRoutes from './routes/usuarioRoutes.js';
 import proyectoRoutes from './routes/proyectoRoutes.js';
@@ -8,26 +8,13 @@ import tareaRoutes from './routes/tareaRoutes.js';
 
 // Llamado del Servidor
 const app = express();
-app.use(express.json());
+app.use(json());
+app.use(corsMiddleware());
+app.disable('x-powered-by');
 // Poder usar Variables de entorno
 dotenv.config();
 // Importación de la conección a la DB
 conectarDB();
-// Configurar CORS
-const whiteList = [process.env.FRONTEND_URL];
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (whiteList.includes(origin)) {
-      // Puede consultar la API
-      callback(null, true);
-    } else {
-      // No permitido
-      callback(new Error('Error de CORS'));
-    }
-  },
-};
-
-app.use(cors(corsOptions));
 
 // Routing
 app.use('/api/usuarios', usuarioRoutes);
